@@ -1,5 +1,3 @@
-Here's a README.md file tailored for your GitHub project that documents the Python script you provided. This README includes an overview, usage instructions, and explanation of what the script does.
-
 🖥️ GPU Process Monitor for Docker Containers
 
 This Python script leverages nvidia-smi to monitor GPU usage and identify processes running inside Docker containers. It provides detailed information about GPU memory usage, utilization, temperature, and associated container information.
