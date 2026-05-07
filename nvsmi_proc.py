@@ -67,16 +67,19 @@ def query_gpu():
             # get container by pid
             command = 'cat /proc/{0:}/cgroup'.format(pid)
             container_id_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][1:]
-            if container_id_str[-1] == '0::/system.slice/containerd.service':
-                container_id_str = container_id_str[-2].replace('1:name=systemd:/docker/','')
-            else:
-                container_id_str = container_id_str[-1].replace('0::/docker/','')
-            # inspect
-            command = "docker inspect --format '{{.Name}}' " + container_id_str
-            container_name_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][0]
-            container_name_str = container_name_str.strip("\'")
-            print(container_id_str,container_name_str)  
-            print('='*80)
+
+            if len(container_id_str)>0:
+                if container_id_str[-1] == '0::/system.slice/containerd.service':
+                    container_id_str = container_id_str[-2].replace('1:name=systemd:/docker/','')
+                else:
+                    container_id_str = container_id_str[-1].replace('0::/docker/','')
+                # inspect
+                command = "sudo docker inspect --format '{{.Name}}' " + container_id_str
+#                docker inspect --format '{{.Name}}' a7f943010262b4071d851a0c00edc683be291129210e5ff643c05269d942fd71
+                container_name_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][0]
+                container_name_str = container_name_str.strip("\'")
+                print(container_id_str,container_name_str)  
+                print('='*80)
     D['ps_info'] = ps_info
     return D
 
