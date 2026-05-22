@@ -74,12 +74,20 @@ def query_gpu():
                 else:
                     container_id_str = container_id_str[-1].replace('0::/docker/','')
                 # inspect
-                command = "sudo docker inspect --format '{{.Name}}' " + container_id_str
+                command = "docker inspect --format '{{.Name}}' " + container_id_str
 #                docker inspect --format '{{.Name}}' a7f943010262b4071d851a0c00edc683be291129210e5ff643c05269d942fd71
                 container_name_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][0]
                 container_name_str = container_name_str.strip("\'")
                 print(container_id_str,container_name_str)  
+
+                command = "docker logs --tail 1 " + container_id_str
+#                docker inspect --format '{{.Name}}' a7f943010262b4071d851a0c00edc683be291129210e5ff643c05269d942fd71
+                container_output_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][-1]
+                container_output_str = container_output_str.strip("\'")
+                print(container_output_str)  
+                
                 print('='*80)
+
     D['ps_info'] = ps_info
     return D
 
