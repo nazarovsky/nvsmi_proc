@@ -48,20 +48,31 @@ def query_gpu():
     D['utilization_gpu']    = utilization_gpu_values
     D['utilization_memory'] = utilization_memory_values
     ps_info = []
+    RED    = "\033[31m"
+    GREEN  = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE   = "\033[34m"
+    CYAN   = "\033[36m"
+    OFF    = "\033[0m"
+
     for i, gpu in enumerate(gpus):
         pid = pid_values[i]
         if pid ==0:
-            print('GPU#{0:01d} : MEM [{1:5d}/{2:5d}] {3:5d} MB | GPU: {4:3d}% MEM: {5:3d}% TEMP {6:3d}C '.format( \
-                i, memory_used_values[i], memory_free_values[i], memory_total_values[i], \
-                utilization_gpu_values[i], utilization_memory_values[i], temperature_gpu_values[i]))
+            S = GREEN + 'GPU#{0:01d} '.format(i) + OFF
+            S = S + ': '+ RED+ 'MEM [{0:5d}/{1:5d}] {2:5d} MB '.format(memory_used_values[i], memory_free_values[i],memory_total_values[i]) + OFF+ ' | '
+            S = S + YELLOW + 'GPU: {0:3d}% MEM: {1:3d}% TEMP {2:3d}C '.format(utilization_gpu_values[i], utilization_memory_values[i], temperature_gpu_values[i]) + OFF
+            print(S)
             print('='*80)
         else:
             command = 'ps -p {0:} -o pid,vsz=MEMORY -o user,group=GROUP -o comm,args=ARGS'.format(pid)
             ps_info_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][1:][0]
             ps_info.append(ps_info_str)
-            print('GPU#{0:01d} : MEM [{1:5d}/{2:5d}] {3:5d} MB | GPU: {4:3d}% MEM: {5:3d}% TEMP {6:3d}C '.format( \
-                i, memory_used_values[i], memory_free_values[i], memory_total_values[i], \
-                utilization_gpu_values[i], utilization_memory_values[i], temperature_gpu_values[i]))
+
+
+            S = GREEN + 'GPU#{0:01d} '.format(i) + OFF
+            S = S + ': '+ RED+ 'MEM [{0:5d}/{1:5d}] {2:5d} MB '.format(memory_used_values[i], memory_free_values[i],memory_total_values[i]) + OFF+ ' | '
+            S = S + YELLOW + 'GPU: {0:3d}% MEM: {1:3d}% TEMP {2:3d}C '.format(utilization_gpu_values[i], utilization_memory_values[i], temperature_gpu_values[i]) + OFF
+            print(S)
             print(ps_info_str)
             print('- '*40)
             # get container by pid
@@ -78,13 +89,13 @@ def query_gpu():
 #                docker inspect --format '{{.Name}}' a7f943010262b4071d851a0c00edc683be291129210e5ff643c05269d942fd71
                 container_name_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][0]
                 container_name_str = container_name_str.strip("\'")
-                print(container_id_str,container_name_str)  
+                print(CYAN + container_id_str + OFF+ ' ' + container_name_str)  
 
                 command = "docker logs --tail 1 " + container_id_str
 #                docker inspect --format '{{.Name}}' a7f943010262b4071d851a0c00edc683be291129210e5ff643c05269d942fd71
                 container_output_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][-1]
                 container_output_str = container_output_str.strip("\'")
-                print(container_output_str)  
+                print(YELLOW + container_output_str + OFF)   
                 
                 print('='*80)
 
