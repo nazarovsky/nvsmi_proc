@@ -53,6 +53,7 @@ def query_gpu():
     YELLOW = "\033[33m"
     BLUE   = "\033[34m"
     CYAN   = "\033[36m"
+    ORANGE = "\033[38;2;255;165;0m"
     OFF    = "\033[0m"
 
     for i, gpu in enumerate(gpus):
@@ -64,17 +65,20 @@ def query_gpu():
             print(S)
             print('='*80)
         else:
-            command = 'ps -p {0:} -o pid,vsz=MEMORY -o user,group=GROUP -o comm,args=ARGS'.format(pid)
+            command = 'ps -p {0:} -o pid,pcpu,pmem,vsz=MEMORY -o user,group=GROUP -o comm=PROGRAM'.format(pid)
+            ps_info_head = sp.check_output(command.split()).decode(DECODE).split('\n')[:][:][0]
             ps_info_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][1:][0]
             ps_info.append(ps_info_str)
-
-
+            command_args_only = 'ps -p {0:} -o args=ARGS'.format(pid)
+            ps_info_command_args_only = sp.check_output(command_args_only.split()).decode(DECODE).split('\n')[:-1][1:][0]
             S = GREEN + 'GPU#{0:01d} '.format(i) + OFF
             S = S + ': '+ RED+ 'MEM [{0:5d}/{1:5d}] {2:5d} MB '.format(memory_used_values[i], memory_free_values[i],memory_total_values[i]) + OFF+ ' | '
             S = S + YELLOW + 'GPU: {0:3d}% MEM: {1:3d}% TEMP {2:3d}C '.format(utilization_gpu_values[i], utilization_memory_values[i], temperature_gpu_values[i]) + OFF
             print(S)
-            print(ps_info_str)
-            print('- '*40)
+            print(ORANGE + ps_info_head + OFF)
+            print(ORANGE + ps_info_str + OFF)
+            print(ORANGE + ps_info_command_args_only + OFF)
+#            print('- '*40)
             # get container by pid
             command = 'cat /proc/{0:}/cgroup'.format(pid)
             container_id_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][1:]
