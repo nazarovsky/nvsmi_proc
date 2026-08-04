@@ -1,4 +1,5 @@
 import subprocess as sp
+import re
 DECODE = 'utf-8'
 
 def query_gpu():
@@ -82,7 +83,7 @@ def query_gpu():
             print(TAB + BLUE_BG + YELLOW + ps_info_head + OFF)
             print(TAB + BLUE_BG + YELLOW + ps_info_str + OFF)
             print(TAB + BLUE_BG + ORANGE + ps_info_command_args_only + OFF)
-#            print('- '*40)
+            print('- '*40)
             # get container by pid
             command = 'cat /proc/{0:}/cgroup'.format(pid)
             container_id_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][1:]
@@ -98,14 +99,21 @@ def query_gpu():
                 container_name_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][0]
                 container_name_str = container_name_str.strip("\'")
                 print(TAB + CYAN + container_id_str + OFF+ ' ' + container_name_str)  
-
-                command = "docker logs --tail 1 " + container_id_str
+                golubev = re.search(r"golubev", container_name_str, re.IGNORECASE)
+                larionov = re.search(r"larionov", container_name_str, re.IGNORECASE)
+                if golubev or larionov: # don't read logs if it is max golubev or roma larionov
+                    pass
+                else:    
+                    command = "docker logs --tail 1 " + container_id_str
 #                docker inspect --format '{{.Name}}' a7f943010262b4071d851a0c00edc683be291129210e5ff643c05269d942fd71
-                container_output_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][-1]
-                container_output_str = container_output_str.strip("\'")
-                print(container_output_str + OFF)   
-                
+                    try:
+                        container_output_str = sp.check_output(command.split()).decode(DECODE).split('\n')[:-1][-1]
+                        container_output_str = container_output_str.strip("\'")
+                        print(container_output_str + OFF)   
+                    except:
+                        print('Failed' + OFF)                           
 #                print('='*80)
+
 
     D['ps_info'] = ps_info
     return D
